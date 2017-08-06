@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<!--
+	Spectral by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+
+
+
+<html>
+
+
+	
+	
+	<head>
+		<title>Stacked Data</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+	</head>
+	
+	
+	<style>
+
+text {
+  font: 10px sans-serif;
+  text-anchor: middle;
+}
+
+.node--hover circle {
+  stroke: #000;
+  stroke-width: 1.2px;
+}
+
+</style>
+	
+	<body>
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1><a href="index.html">OC CRIME</a></h1>
+<!--
+						<nav id="nav">
+							<ul>
+								<li class="special">
+									<a href="#menu" class="menuToggle"><span>Menu</span></a>
+									<div id="menu">
+										<ul>
+											<li><a href="index.html">Home</a></li>
+											<li><a href="generic.html">Generic</a></li>
+											<li><a href="elements.html">Elements</a></li>
+											<li><a href="#">Sign Up</a></li>
+											<li><a href="#">Log In</a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</nav>
+-->
+					</header>
+
+				<!-- Main -->
+					<article id="main">
+						<header>
+							<h2>Crime By Area</h2>
+							<p>Hierarcharial Chart of All of OC Sheriff Areas</p>
+						</header>
+						<section class="wrapper style5">
+							<div class="inner">
+
+								<h3>Dense Information</h3>
+								<p>This is a packed circle chart from Mike Bostock, It shows a complete listing of all crime within the OC Sheriff area of operations for contract and unincorprated areas.  The outer ring represents all of the data for OCSD.  Each circle is a City or Other area, within each city is a collection of crime types and then finally we get down to individual crimes (penal code charges).  Hover over the circles to view the record counts for number of arrests for 2015, 2016 and Q1 2017.</p>
+
+								<div id="painchart">
+									
+<svg width="960" height="960"><g transform="translate(1,1)"></g></svg>
+										</div>
+
+								<hr />
+
+								
+								<br />
+                                 <a href="index.html#finalcharts">Return to the Charts</a>
+							</div>
+							
+						</section>
+					</article>
+
+				<!-- Footer -->
+					<footer id="footer">
+
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+<!--
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/skel.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]
+			<script src="assets/js/main.js"></script>
+-->
+
+
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+var format = d3.format(",d");
+
+var color = d3.scaleSequential(d3.interpolateViridis)
+    .domain([-4, 4]);
+	
+
+var stratify = d3.stratify()
+    .parentId(function(d) { return d.id.substring(0, d.id.lastIndexOf(".")); });
+
+var pack = d3.pack()
+    .size([width - 2, height - 2])
+    .padding(3);
+
+d3.csv("crimebytype.csv", function(error, data) {
+  if (error) throw error;
+
+  var root = stratify(data)
+      .sum(function(d) { return d.value; })
+      .sort(function(a, b) { return b.value - a.value; });
+
+  pack(root);
+
+  var node = svg.select("g")
+    .selectAll("g")
+    .data(root.descendants())
+    .enter().append("g")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+      .attr("class", function(d) { return "node" + (!d.children ? " node--leaf" : d.depth ? "" : " node--root"); })
+      .each(function(d) { d.node = this; })
+      .on("mouseover", hovered(true))
+      .on("mouseout", hovered(false));
+
+  node.append("circle")
+      .attr("id", function(d) { return "node-" + d.id; })
+      .attr("r", function(d) { return d.r; })
+      .style("fill", function(d) { return color(d.depth); });
+
+  var leaf = node.filter(function(d) { return !d.children; });
+
+  leaf.append("clipPath")
+      .attr("id", function(d) { return "clip-" + d.id; })
+    .append("use")
+      .attr("xlink:href", function(d) { return "#node-" + d.id + ""; });
+
+  leaf.append("text")
+      .attr("clip-path", function(d) { return "url(#clip-" + d.id + ")"; })
+    .selectAll("tspan")
+    .data(function(d) { return d.id.substring(d.id.lastIndexOf(".") + 1).split(/(?=[A-Z][^A-Z])/g); })
+    .enter().append("tspan")
+      .attr("x", 0)
+      .attr("y", function(d, i, nodes) { return 13 + (i - nodes.length / 2 - 0.5) * 10; })
+      .text(function(d) { return d; });
+
+  node.append("title")
+      .text(function(d) { return d.id + "\n" + format(d.value); });
+});
+
+function hovered(hover) {
+  return function(d) {
+    d3.selectAll(d.ancestors().map(function(d) { return d.node; })).classed("node--hover", hover);
+  };
+}
+
+</script>
+		
+		
+	</body>
+</html>
