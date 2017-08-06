@@ -1,0 +1,281 @@
+<!DOCTYPE HTML>
+<!--
+	Spectral by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+
+
+
+<html>
+
+
+	
+	
+	<head>
+		<title>Stacked Data</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+	</head>
+	
+	
+	<style>
+
+stackedbody {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: auto;
+  position: relative;
+  width: 960px;
+}
+
+text {
+  font: 10px sans-serif;
+}
+
+.axis path {
+  display: none;
+}
+
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.group-label {
+  font-weight: bold;
+  text-anchor: end;
+}
+
+myform {
+ 
+  right: 10px;
+  top: 10px;
+  height:100px;
+  width:200px;
+}
+	g.bar {
+			cursor: pointer;
+		}
+
+		g.bar text {
+			font-family: sans-serif;
+			font-size: 11px;
+			fill: white;
+			font-style: bold;
+			text-anchor: middle;
+			opacity: 0;
+		}
+
+		g.bar.highlight text {
+			opacity: 1;
+		}
+
+		g.bar.highlight rect {
+			fill: Maroon;
+		}
+</style>	
+	
+	
+	<body>
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<h1><a href="index.html">OC CRIME</a></h1>
+<!--
+						<nav id="nav">
+							<ul>
+								<li class="special">
+									<a href="#menu" class="menuToggle"><span>Menu</span></a>
+									<div id="menu">
+										<ul>
+											<li><a href="index.html">Home</a></li>
+											<li><a href="generic.html">Generic</a></li>
+											<li><a href="elements.html">Elements</a></li>
+											<li><a href="#">Sign Up</a></li>
+											<li><a href="#">Log In</a></li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+						</nav>
+-->
+					</header>
+
+				<!-- Main -->
+					<article id="main">
+						<header>
+							<h2>Stacked Data</h2>
+							<p>Total Crime and Break out by Type</p>
+						</header>
+						<section class="wrapper style5">
+							<div class="inner">
+
+								<h3>Stacked Chart</h3>
+								<p>This chart shows a few different views of the information.  By default it starts as an exploded view and allows you to view the trend by month of crime in OC.  After a short delay the bars collasp into a stacked bar chart allowing the user to view total crime.</p>
+
+								<div id="stackedchart">
+									<form>
+  <label><input style="myform" type="radio" name="mode" value="stackedmultiples" checked> Click me to see Exploded</label>
+  <label><input type="radio" name="mode" value="stackedstacked">Click me to see Stacked</label>
+</form>
+									<svg id="stackedchartsvg">
+									</svg></div>
+
+								<hr />
+
+								<h4>Crime Trends</h4>
+								<p>As expected the number of drug related arrests continues to climb, which is to be expected considering the current drug crisis Orange County is facing.  The news is filled with stories of drug overdoes and life saving performed by public safety personnel administering anti-overdose drugs.</p>
+
+								<p>Based on the stories that claim other crimes climb in relation to drug offenses is actually surprising.  The areas that increases were expected did not see increases and in some areas appear to be declining or remaining flat.</p>
+								<br />
+                                 <a href="index.html#finalcharts">Return to the Charts</a>
+							</div>
+							
+						</section>
+					</article>
+
+				<!-- Footer -->
+					<footer id="footer">
+
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+<!--
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/skel.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]
+			<script src="assets/js/main.js"></script>
+-->
+
+
+
+<div id="stackedbar"><svg id="stackedbarsvg"></svg></div>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+
+var stackedparseDate = d3.time.format("%Y-%m").parse,
+    stackedformatYear = d3.format("02d"),
+	// formatDate = function(d) { return ((d.getMonth() / 3 | 0) + 1) + formatYear(d.getFullYear() % 100); };
+    stackedformatDate = function(d) { return stackedformatYear(d.getFullYear() %100) +"-"+d.getMonth(); };
+
+var stackedmargin = {top: 10, right: 20, bottom: 20, left: 160},
+    stackedwidth = 960 - stackedmargin.left - stackedmargin.right,
+    stackedheight = 500 - stackedmargin.top - stackedmargin.bottom;
+
+var stackedy0 = d3.scale.ordinal()
+    .rangeRoundBands([stackedheight, 0], .2);
+
+var stackedy1 = d3.scale.linear();
+
+var stackedx = d3.scale.ordinal()
+    .rangeRoundBands([0, stackedwidth], .1, 0);
+
+var stackedxAxis = d3.svg.axis()
+    .scale(stackedx)
+    .orient("bottom")
+    .tickFormat(stackedformatDate);
+
+var stackednest = d3.nest()
+    .key(function(d) { return d.Crimetype; });
+
+var stackedstack = d3.layout.stack()
+    .values(function(d) { return d.values; })
+    .x(function(d) { return d.date; })
+    .y(function(d) { return d.value; })
+    .out(function(d, y0) { d.valueOffset = y0; });
+
+var stackedcolor = d3.scale.category10();
+
+var stackedsvg = d3.select("#stackedchartsvg")
+    .attr("width", stackedwidth + stackedmargin.left + stackedmargin.right)
+    .attr("height", stackedheight + stackedmargin.top + stackedmargin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + stackedmargin.left + "," + stackedmargin.top + ")");
+
+d3.csv("stackeddata.csv", function(error, data) {
+
+  data.forEach(function(d) {
+    d.date = stackedparseDate(d.date);
+    d.value = +d.value;
+  });
+
+  var stackeddataByGroup = stackednest.entries(data);
+
+  stackedstack(stackeddataByGroup);
+  stackedx.domain(stackeddataByGroup[0].values.map(function(d) { return d.date; }));
+  stackedy0.domain(stackeddataByGroup.map(function(d) { return d.key; }));
+  stackedy1.domain([0, d3.max(data, function(d) { return d.value; })]).range([stackedy0.rangeBand(), 0]);
+
+  var stackedgroup = stackedsvg.selectAll(".group")
+      .data(stackeddataByGroup)
+    .enter().append("g")
+      .attr("class", "group")
+      .attr("transform", function(d) { return "translate(0," + stackedy0(d.key) + ")"; });
+
+  stackedgroup.append("text")
+      .attr("class", "group-label")
+      .attr("x", -6)
+      .attr("y", function(d) { return stackedy1(d.values[0].value / 2); })
+      .attr("dy", ".35em")
+      .text(function(d) { return d.key; });
+
+  stackedgroup.selectAll("rect")
+      .data(function(d) { return d.values; })
+    .enter().append("rect")
+      .style("fill", function(d) { return stackedcolor(d.Crimetype); })
+      .attr("x", function(d) { return stackedx(d.date); })
+      .attr("y", function(d) { return stackedy1(d.value); })
+      .attr("width", stackedx.rangeBand())
+      .attr("height", function(d) { return stackedy0.rangeBand() - stackedy1(d.value); });
+
+	
+  stackedgroup.filter(function(d, i) { return !i; }).append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + stackedy0.rangeBand() + ")")
+      .call(stackedxAxis);
+
+  d3.selectAll("input").on("change", stackedchange);
+
+  var stackedtimeout = setTimeout(function() {
+    d3.select("input[value=\"stacked\"]").property("checked", true).each(stackedchange);
+  }, 2000);
+
+  function stackedchange() {
+    clearTimeout(stackedtimeout);
+    if (this.value === "stackedmultiples") stackedtransitionMultiples();
+    else stackedtransitionStacked();
+  }
+
+  function stackedtransitionMultiples() {
+    var stackedt = stackedsvg.transition().duration(750),
+       stackedg = stackedt.selectAll(".group").attr("transform", function(d) { return "translate(0," + stackedy0(d.key) + ")"; });
+    stackedg.selectAll("rect").attr("y", function(d) { return stackedy1(d.value); });
+    stackedg.select(".group-label").attr("y", function(d) { return stackedy1(d.values[0].value / 2); })
+  }
+
+  function stackedtransitionStacked() {
+    var stackedt = stackedsvg.transition().duration(750),
+        stackedg = stackedt.selectAll(".group").attr("transform", "translate(0," + stackedy0(stackedy0.domain()[0]) + ")");
+    stackedg.selectAll("rect").attr("y", function(d) { return stackedy1(d.value + d.valueOffset); })
+    stackedg.select(".group-label").attr("y", function(d) { return stackedy1(d.values[0].value / 2 + d.values[0].valueOffset); })
+  }
+});
+
+</script>	
+		
+		
+	</body>
+</html>
