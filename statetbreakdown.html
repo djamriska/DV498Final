@@ -6,7 +6,7 @@
 -->
 <html>
 	<head>
-		<title>Crime based on  % of total Crime</title>
+		<title>Top 10 Sheriff Departments by State</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
@@ -16,18 +16,59 @@
 	</head>
 	<style>
 
-.bar {
-  fill: steelblue;
+body {
+  font: 15px sans-serif;
 }
 
-.bar:hover {
-  fill: brown;
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
-.axis--x path {
+.departmentbar {
+  fill: orange;
+}
+
+.departmentbar:hover {
+  fill: orangered ;
+}
+
+.x.axis path {
   display: none;
 }
 
+.departmentd3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 12px;
+  width: 18em;
+word-wrap:break-word;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.departmentd3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.departmentd3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
 </style>
 	<body>
 
@@ -36,7 +77,7 @@
 
 				<!-- Header -->
 					<header id="header">
-						<h1><a href="index.html">Spectral</a></h1>
+						<h1><a href="index.html">OC CRIME</a></h1>
 						<nav id="nav">
 							<ul>
 								<li class="special">
@@ -58,19 +99,18 @@
 				<!-- Main -->
 					<article id="main">
 						<header>
-							<h2>Crime based on  % of total Crime</h2>
-							<p>Total Crime and Break out by City</p>
+							<h2>The Top States</h2>
+							<p>Hover over each state to learn interesting facts about each Sheriff's Department</p>
 						</header>
 						<section class="wrapper style5">
 							<div class="inner">
 
-
-
-								<hr />
-								
-								<div id="citychart"><svg width="1240" height="500" id="citychartsvg"></svg></div>
-
-
+                                     <div id="one">
+	<p></p>
+	</div>
+	<div id="two">
+		<p></p>
+	</div>
 
 							</div>
 							<a href="index.html#finalcharts">Return to the Charts</a>
@@ -95,53 +135,82 @@
 			<script src="assets/js/util.js"></script>
 			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
 			<script src="assets/js/main.js"></script>
-		<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/294A817E-595D-A545-91D7-25E1A654B59E/main.js" charset="UTF-8"></script><script src="https://d3js.org/d3.v4.min.js"></script>
+<script type="text/javascript" src="http://gc.kis.v2.scr.kaspersky-labs.com/294A817E-595D-A545-91D7-25E1A654B59E/main.js" charset="UTF-8"></script><script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
 <script>
-var svg = d3.select("svg"),
-    margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom;
+var margin = {top: 200, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-var x = d3.scaleBand().rangeRound([0, width*1]).padding(0.1),
-    y = d3.scaleLinear().rangeRound([height, 0]);
+var formatPercent = d3.format(".0%");
 
-var g = svg.append("g")
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(formatPercent);
+
+var tip = d3.tip()
+  .attr('class', 'departmentd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>"+d.department+" Sheriff<br /><br /></strong> <span style='color:white'> Overall Rank: "+d.rank+"<br /><br />Established: "+d.established+"<br />Total Officers: "+d.sworn+ "<br/>County Area: "+d.area+" Sq. Miles <br />Population Served: "+d.population+"<br />Current Sheriff: "+d.sheriff+"</span><span style='color:yellow;word-wrap:break-word;width:100px;'><br />"+d.fact+"</span>";
+  })
+
+var svg = d3.select("#one").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.csv("citypercentage.csv", function(d) {
-  d.frequency = +d.frequency;
-  return d;
-}, function(error, data) {
-  if (error) throw error;
+svg.call(tip);
 
-  x.domain(data.map(function(d) { return d.letter; }));
-  y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+d3.csv("depts3.csv", type, function(error, data) {
+  x.domain(data.map(function(d) { return d.state; }));
+  y.domain([0, d3.max(data, function(d) { return d.sworn; })]);
 
-  g.append("g")
-      .attr("class", "axis axis--x")
+  svg.append("g")
+      .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
+      .call(xAxis);
 
-  g.append("g")
-      .attr("class", "axis axis--y")
-      .call(d3.axisLeft(y).ticks(10, "%"))
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
     .append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", 6)
-      .attr("dy", "0.71em")
-      .attr("text-anchor", "end")
-      .text("Frequency");
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Sworn");
 
-  g.selectAll(".bar")
-    .data(data)
+  svg.selectAll(".bar")
+      .data(data)
     .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return x(d.letter); })
-      .attr("y", function(d) { return y(d.frequency); })
-      .attr("width", x.bandwidth())
-	  
-      .attr("height", function(d) { return height - y(d.frequency); });
+      .attr("class", "departmentbar")
+      .attr("x", function(d) { return x(d.state); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.sworn); })
+	  .attr("height", function(d) { return height - y(d.sworn); })
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
+  
 });
+
+function type(d) {
+  d.sworn = +d.sworn;
+  return d;
+}
 
 </script>
 	</body>
