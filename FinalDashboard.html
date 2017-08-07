@@ -19,31 +19,31 @@
 
 
 #pieChart {    
-	position:absolute;
+
 	top:10px;
 	left:10px;
-	width:400px;
-	height: 400px; 
+	width:500px;
+	height: 500px; 
 }
 
 
 
 #lineChart {    
-	position:absolute;
-	top:10px;
-	left:410px;
-	height: 150px;
-}
 
-#barChart {
-	position:absolute;
-	top:160px;
-	left:410px;
+	top:10px;
+	left:510px;
 	height: 250px;
 }
 
+#barChart {
+
+	top:50px;
+	left:510px;
+	height: 350px;
+}
+
 .slice {
-   font-size: 8pt;
+   font-size: 7pt;
    font-family: Verdana;
    fill: white; //svg specific - instead of color
    font-weight: bold;	
@@ -160,19 +160,14 @@ td {
 						<section class="wrapper style5">
 							<div class="inner">
 
-								<h3>Stacked Chart</h3>
-								<p>This chart shows a few different views of the information.  By default it starts as an exploded view and allows you to view the trend by month of crime in OC.  After a short delay the bars collasp into a stacked bar chart allowing the user to view total crime.</p>
+								<h3>Crime Dashboard</h3>
+								<p>This interactive pair of charts shows you the crime breakdown by contract city and when you click on a slice the associated crime levels are shown.</p>
 
-								<p>Place Chart Here</p>
-
+						
 								<div id="pieChart"></div>
 								<div id="barChart"></div>  
 								<div id="lineChart"></div>
 								
-								<h4>Crime Trends</h4>
-								<p>As expected the number of drug related arrests continues to climb, which is to be expected considering the current drug crisis Orange County is facing.  The news is filled with stories of drug overdoes and life saving performed by public safety personnel administering anti-overdose drugs.</p>
-
-								<p>Based on the stories that claim other crimes climb in relation to drug offenses is actually surprising.  The areas that increases were expected did not see increases and in some areas appear to be declining or remaining flat.</p>
 
 							</div>
 							<a href="index.html#finalcharts">Return to the Charts</a>
@@ -246,10 +241,10 @@ function dsPieChart(){
 	      ]
 	      ;
 
-	var 	width = 400,
-		   height = 400,
+	var    width = 500,
+		   height = 500,
 		   outerRadius = Math.min(width, height) / 2,
-		   innerRadius = outerRadius * .999,   
+		   innerRadius = outerRadius * .9999,   
 		   // for animation
 		   innerRadiusFinal = outerRadius * .5,
 		   innerRadiusFinal3 = outerRadius* .45,
@@ -301,7 +296,7 @@ function dsPieChart(){
 	  // source: http://bl.ocks.org/1305337#index.html
 	  arcs.filter(function(d) { return d.endAngle - d.startAngle > .2; })
 	  		.append("svg:text")
-	      .attr("dy", ".35em")
+	      .attr("dy", ".305em")
 	      .attr("text-anchor", "middle")
 	      .attr("transform", function(d) { return "translate(" + arcFinal.centroid(d) + ")rotate(" + angle(d) + ")"; })
 	      //.text(function(d) { return formatAsPercentage(d.value); })
@@ -319,7 +314,7 @@ function dsPieChart(){
 		vis.append("svg:text")
 	     	.attr("dy", ".35em")
 	      .attr("text-anchor", "middle")
-	      .text("Revenue Share 2012")
+	      .text("Crime by City 2016")
 	      .attr("class","title")
 	      ;		    
 
@@ -348,7 +343,7 @@ function dsPieChart(){
 				/* update bar chart when user selects piece of the pie chart */
 				//updateBarChart(dataset[i].category);
 				updateBarChart(d.data.category, color(i));
-				updateLineChart(d.data.category, color(i));
+				//updateLineChart(d.data.category, color(i));
 			 
 	}
 }
@@ -363,88 +358,6 @@ dsPieChart();
 
 
 var datasetBarChart = [
-	/*
-{ group: "All", category: "Q1", measure: 1814 }, 
-{ group: "All", category: "Q2", measure: 78258.0845 }, 
-{ group: "All", category: "Q3", measure: 60610.2355 }, 
-{ group: "All", category: "Q4", measure: 30493.1686 }, 
-{ group: "All", category: "Q1-2016", measure: 56097.0151 }, 
-{ group: "San Clemente", category: "Q1", measure: 19441.5648 }, 
-{ group: "San Clemente", category: "Q2", measure: 25922.0864 }, 
-{ group: "San Clemente", category: "Q3", measure: 9720.7824 }, 
-{ group: "San Clemente", category: "Q4", measure: 6480.5216 }, 
-{ group: "San Clemente", category: "Q1-2016", measure: 19441.5648 }, 
-{ group: "Lake Forest", category: "Q1", measure: 22913.2728 }, 
-{ group: "Lake Forest", category: "Q2", measure: 7637.7576 }, 
-{ group: "Lake Forest", category: "Q3", measure: 23549.7526 }, 
-{ group: "Lake Forest", category: "Q4", measure: 1909.4394 }, 
-{ group: "Lake Forest", category: "Q1-2016", measure: 7637.7576 }, 
-{ group: "John", category: "Q1", measure: 1041.5124 }, 
-{ group: "John", category: "Q2", measure: 2430.1956 }, 
-{ group: "John", category: "Q3", measure: 15275.5152 }, 
-{ group: "John", category: "Q4", measure: 4166.0496 }, 
-{ group: "John", category: "Q1-2016", measure: 11803.8072 }, 
-{ group: "Rick", category: "Q1", measure: 7406.3104 }, 
-{ group: "Rick", category: "Q2", measure: 2545.9192 }, 
-{ group: "Rick", category: "Q3", measure: 1620.1304 }, 
-{ group: "Rick", category: "Q4", measure: 8563.5464 }, 
-{ group: "Rick", category: "Q1-2016", measure: 3008.8136 }, 
-{ group: "Lenny", category: "Q1", measure: 7637.7576 }, 
-{ group: "Lenny", category: "Q2", measure: 35411.4216 }, 
-{ group: "Lenny", category: "Q3", measure: 8332.0992 }, 
-{ group: "Lenny", category: "Q4", measure: 6249.0744 }, 
-{ group: "Lenny", category: "Q1-2016", measure: 11803.8072 }, 
-{ group: "Paul", category: "Q1", measure: 3182.399 }, 
-{ group: "Paul", category: "Q2", measure: 867.927 }, 
-{ group: "Paul", category: "Q3", measure: 1808.18125 }, 
-{ group: "Paul", category: "Q4", measure: 795.59975 }, 
-{ group: "Paul", category: "Q1-2016", measure: 578.618 }, 
-{ group: "Steve", category: "Q1", measure: 2227.6793 }, 
-{ group: "Steve", category: "Q2", measure: 3442.7771 }, 
-{ group: "Steve", category: "Q3", measure: 303.77445 }, 
-{ group: "Steve", category: "Q4", measure: 2328.93745 }, 
-{ group: "Steve", category: "Q1-2016", measure: 1822.6467 },
-	{ group: "All", category: "Q1", measure: 1814 }, 
-{ group: "All", category: "Q2", measure: 78258.0845 }, 
-{ group: "All", category: "Q3", measure: 60610.2355 }, 
-{ group: "All", category: "Q4", measure: 30493.1686 }, 
-{ group: "All", category: "Q1-2016", measure: 56097.0151 }, 
-{ group: "San Clemente", category: "Q1", measure: 19441.5648 }, 
-{ group: "San Clemente", category: "Q2", measure: 25922.0864 }, 
-{ group: "San Clemente", category: "Q3", measure: 9720.7824 }, 
-{ group: "San Clemente", category: "Q4", measure: 6480.5216 }, 
-{ group: "San Clemente", category: "Q1-2016", measure: 19441.5648 }, 
-{ group: "Lake Forest", category: "Q1", measure: 22913.2728 }, 
-{ group: "Lake Forest", category: "Q2", measure: 7637.7576 }, 
-{ group: "Lake Forest", category: "Q3", measure: 23549.7526 }, 
-{ group: "Lake Forest", category: "Q4", measure: 1909.4394 }, 
-{ group: "Lake Forest", category: "Q1-2016", measure: 7637.7576 }, 
-{ group: "John", category: "Q1", measure: 1041.5124 }, 
-{ group: "John", category: "Q2", measure: 2430.1956 }, 
-{ group: "John", category: "Q3", measure: 15275.5152 }, 
-{ group: "John", category: "Q4", measure: 4166.0496 }, 
-{ group: "John", category: "Q1-2016", measure: 11803.8072 }, 
-{ group: "Rick", category: "Q1", measure: 7406.3104 }, 
-{ group: "Rick", category: "Q2", measure: 2545.9192 }, 
-{ group: "Rick", category: "Q3", measure: 1620.1304 }, 
-{ group: "Rick", category: "Q4", measure: 8563.5464 }, 
-{ group: "Rick", category: "Q1-2016", measure: 3008.8136 }, 
-{ group: "Lenny", category: "Q1", measure: 7637.7576 }, 
-{ group: "Lenny", category: "Q2", measure: 35411.4216 }, 
-{ group: "Lenny", category: "Q3", measure: 8332.0992 }, 
-{ group: "Lenny", category: "Q4", measure: 6249.0744 }, 
-{ group: "Lenny", category: "Q1-2016", measure: 11803.8072 }, 
-{ group: "Paul", category: "Q1", measure: 3182.399 }, 
-{ group: "Paul", category: "Q2", measure: 867.927 }, 
-{ group: "Paul", category: "Q3", measure: 1808.18125 }, 
-{ group: "Paul", category: "Q4", measure: 795.59975 }, 
-{ group: "Paul", category: "Q1-2016", measure: 578.618 }, 
-{ group: "Steve", category: "Q1", measure: 2227.6793 }, 
-{ group: "Steve", category: "Q2", measure: 3442.7771 }, 
-{ group: "Steve", category: "Q3", measure: 303.77445 }, 
-{ group: "Steve", category: "Q4", measure: 2328.93745 }, 
-{ group: "Steve", category: "Q1-2016", measure: 1822.6467 }, 
-*/
 	
 {group: "All", category: "Crimes Against Persons", measure: 3950},	
 {group: "All", category: "DISTURBANCE", measure: 550},	
@@ -537,7 +450,7 @@ function dsBarChartBasics() {
 		width = 960 - margin.left - margin.right,
 	   height = 250 - margin.top - margin.bottom,
 		colorBar = d3.scale.category20(),
-		barPadding = 1
+		barPadding = 2
 		;
 		
 		return {
@@ -667,7 +580,7 @@ function dsBarChart() {
 		.attr("y", 15)
 		.attr("class","title")				
 		.attr("text-anchor", "middle")
-		.text("Overall Sales Breakdown 2012")
+		.text("Overall Crime for 2016")
 		;
 }
 
@@ -748,7 +661,7 @@ function updateBarChart(group, colorChosen) {
 			.attr("y", 15)
 			.attr("class","title")				
 			.attr("text-anchor", "middle")
-			.text(group + "'s Sales Breakdown 2012")
+			.text(group + "'s Crime Breakdown 2016")
 		;
 }
 
@@ -759,86 +672,6 @@ function updateBarChart(group, colorChosen) {
 */
 
 var datasetLineChart = [
-{ group: "All", category: 2008, measure: 289309 }, 
-{ group: "All", category: 2009, measure: 234998 }, 
-{ group: "All", category: 2010, measure: 310900 }, 
-{ group: "All", category: 2011, measure: 223900 }, 
-{ group: "All", category: 2012, measure: 234500 }, 
-{ group: "San Clemente", category: 2008, measure: 81006.52 }, 
-{ group: "San Clemente", category: 2009, measure: 70499.4 }, 
-{ group: "San Clemente", category: 2010, measure: 96379 }, 
-{ group: "San Clemente", category: 2011, measure: 64931 }, 
-{ group: "San Clemente", category: 2012, measure: 70350 }, 
-{ group: "Lake Forest", category: 2008, measure: 63647.98 }, 
-{ group: "Lake Forest", category: 2009, measure: 61099.48 }, 
-{ group: "Lake Forest", category: 2010, measure: 87052 }, 
-{ group: "Lake Forest", category: 2011, measure: 58214 }, 
-{ group: "Lake Forest", category: 2012, measure: 58625 }, 
-{ group: "Rick", category: 2008, measure: 23144.72 }, 
-{ group: "Rick", category: 2009, measure: 14099.88 }, 
-{ group: "Rick", category: 2010, measure: 15545 }, 
-{ group: "Rick", category: 2011, measure: 11195 }, 
-{ group: "Rick", category: 2012, measure: 11725 }, 
-{ group: "John", category: 2008, measure: 34717.08 }, 
-{ group: "John", category: 2009, measure: 30549.74 }, 
-{ group: "John", category: 2010, measure: 34199 }, 
-{ group: "John", category: 2011, measure: 33585 }, 
-{ group: "John", category: 2012, measure: 35175 }, 
-{ group: "Lenny", category: 2008, measure: 69434.16 }, 
-{ group: "Lenny", category: 2009, measure: 46999.6 }, 
-{ group: "Lenny", category: 2010, measure: 62180 }, 
-{ group: "Lenny", category: 2011, measure: 40302 }, 
-{ group: "Lenny", category: 2012, measure: 42210 }, 
-{ group: "Paul", category: 2008, measure: 7232.725 }, 
-{ group: "Paul", category: 2009, measure: 4699.96 }, 
-{ group: "Paul", category: 2010, measure: 6218 }, 
-{ group: "Paul", category: 2011, measure: 8956 }, 
-{ group: "Paul", category: 2012, measure: 9380 }, 
-{ group: "Steve", category: 2008, measure: 10125.815 }, 
-{ group: "Steve", category: 2009, measure: 7049.94 }, 
-{ group: "Steve", category: 2010, measure: 9327 }, 
-{ group: "Steve", category: 2011, measure: 6717 }, 
-{ group: "Steve", category: 2012, measure: 7035 },
-	{ group: "All", category: 2008, measure: 289309 }, 
-{ group: "All", category: 2009, measure: 234998 }, 
-{ group: "All", category: 2010, measure: 310900 }, 
-{ group: "All", category: 2011, measure: 223900 }, 
-{ group: "All", category: 2012, measure: 234500 }, 
-{ group: "San Clemente", category: 2008, measure: 81006.52 }, 
-{ group: "San Clemente", category: 2009, measure: 70499.4 }, 
-{ group: "San Clemente", category: 2010, measure: 96379 }, 
-{ group: "San Clemente", category: 2011, measure: 64931 }, 
-{ group: "San Clemente", category: 2012, measure: 70350 }, 
-{ group: "Lake Forest", category: 2008, measure: 63647.98 }, 
-{ group: "Lake Forest", category: 2009, measure: 61099.48 }, 
-{ group: "Lake Forest", category: 2010, measure: 87052 }, 
-{ group: "Lake Forest", category: 2011, measure: 58214 }, 
-{ group: "Lake Forest", category: 2012, measure: 58625 }, 
-{ group: "Rick", category: 2008, measure: 23144.72 }, 
-{ group: "Rick", category: 2009, measure: 14099.88 }, 
-{ group: "Rick", category: 2010, measure: 15545 }, 
-{ group: "Rick", category: 2011, measure: 11195 }, 
-{ group: "Rick", category: 2012, measure: 11725 }, 
-{ group: "John", category: 2008, measure: 34717.08 }, 
-{ group: "John", category: 2009, measure: 30549.74 }, 
-{ group: "John", category: 2010, measure: 34199 }, 
-{ group: "John", category: 2011, measure: 33585 }, 
-{ group: "John", category: 2012, measure: 35175 }, 
-{ group: "Lenny", category: 2008, measure: 69434.16 }, 
-{ group: "Lenny", category: 2009, measure: 46999.6 }, 
-{ group: "Lenny", category: 2010, measure: 62180 }, 
-{ group: "Lenny", category: 2011, measure: 40302 }, 
-{ group: "Lenny", category: 2012, measure: 42210 }, 
-{ group: "Paul", category: 2008, measure: 7232.725 }, 
-{ group: "Paul", category: 2009, measure: 4699.96 }, 
-{ group: "Paul", category: 2010, measure: 6218 }, 
-{ group: "Paul", category: 2011, measure: 8956 }, 
-{ group: "Paul", category: 2012, measure: 9380 }, 
-{ group: "Steve", category: 2008, measure: 10125.815 }, 
-{ group: "Steve", category: 2009, measure: 7049.94 }, 
-{ group: "Steve", category: 2010, measure: 9327 }, 
-{ group: "Steve", category: 2011, measure: 6717 }, 
-{ group: "Steve", category: 2012, measure: 7035 }
 ]
 ;
 
@@ -858,7 +691,7 @@ function datasetLineChartChosen(group) {
 function dsLineChartBasics() {
 
 	var margin = {top: 20, right: 10, bottom: 0, left: 50},
-	    width = 500 - margin.left - margin.right,
+	    width = 600 - margin.left - margin.right,
 	    height = 150 - margin.top - margin.bottom
 	    ;
 		
@@ -952,7 +785,7 @@ function dsLineChart() {
 
 }
 
-dsLineChart();
+//dsLineChart();
 
 
  /* ** UPDATE CHART ** */
